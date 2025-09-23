@@ -1,0 +1,17 @@
+#sortBy{
+    margin: 10px;
+    height: 25px;
+    width: 100px;
+}
+#results{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px 10px;
+}
+.meal{
+    background-color: gray;
+    align-items: center;
+    padding: 10px;
+    justify-content: center;
+    cursor: pointer;
+}

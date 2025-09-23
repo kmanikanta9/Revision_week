@@ -3,19 +3,196 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meal Data</title>
+    <title>DOM MAnipulation</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <h1>Meal Finder</h1>
 
-    <div id="first">
-        <div>
-            <p>Category:</p>
-        </div>
+
+        <!-- Search Section -->
+      <div class="search-section">
+        <div class="search-controls">
+        <input type="text" placeholder="Search for meals" id="searchInput">
+        <button id="searchBtn">Search</button>
+        <button id="clearBtn">Clear</button>
+        </div> 
+
+        <select id="sortBy">
+            <!-- <option value="">Sort</option> -->
+            <option value="name-asc">Sort: A -> Z</option>
+            <option value="name-desc">Sort: Z-> A</option>
+        </select>
+      </div>
+
+
+
+
+      <div id="results"></div>
+     <div id="pagination">
+        <button id="prevBtn">Prev</button>
+        <span id="pageInfo"></span>
+        <button id="nextBtn">Next</button>
+     </div>
     </div>
-    
 </body>
+  <script>
+    const contain = document.querySelector(".container");
+    const serachInput = document.getElementById("searchInput");
+const searchBtn = document.getElementById("searchBtn");
+const clearBtn = document.getElementById("clearBtn");
+const results = document.getElementById("results");
+const sortBy = document.getElementById("sortBy");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const pageInfo = document.getElementById("pageInfo");
+
+searchBtn.addEventListener("click", handleSearch);
+clearBtn.addEventListener("click", handleClear);
+serachInput.addEventListener("input", handleInputSearch);
+sortBy.addEventListener("change", handleSorting);
+
+// https://www.themealdb.com/api/json/v1/1/search.php?s=${}
+
+let allMeals = [];
+let currentPage = 1;
+const mealsPerPage = 5;
+
+async function fetchMeals(query) {
+  try {
+    const response = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`
+    );
+    const data = await response.json();
+    console.log(data);
+    if (data.meals) {
+      allMeals = data.meals;
+      currentPage = 1 // reset page after every new data load
+      // renderMeals(data.meals)
+      handleSorting();
+    }
+  } catch (error) {
+    console.log("Error", error.message);
+  }
+}
+
+async function handleSearch() {
+  const query = serachInput.value.trim();
+  currentPage = 1
+  if (query) {
+    await fetchMeals(query);
+  }
+}
+
+async function handleInputSearch() {
+  const query = serachInput.value.trim();
+    currentPage = 1
+  if (query.length > 2) {
+    await fetchMeals(query);
+  } else {
+    results.innerHTML = "<p>Type at least 3 characters....</p>";
+  }
+}
+
+function handleClear() {
+  serachInput.value = "";
+  allMeals = [];
+}
+
+function renderMeals(meals) {
+  results.innerHTML = "";
+  const totalPage = Math.ceil(meals.length/mealsPerPage);
+if(totalPage === 0){
+    results.innerHTML = "<p>No meals to show</p>";
+    pageInfo.textContent = "";
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    return;
+}
 
 
+
+  if(currentPage < 1) currentPage = 1;
+  if(currentPage > totalPage) currentPage = totalPage;
+
+  const startIndex = (currentPage-1) * mealsPerPage;
+  const endIndex = startIndex + mealsPerPage;
+
+  const mealsToshow = meals.slice(startIndex, endIndex);
+
+
+  mealsToshow.forEach((meal) => {
+    const div = document.createElement("div");
+    div.className = "meal";
+
+    div.innerHTML = `
+    <h3>${meal.strMeal}</h3>
+    <img src=${meal.strMealThumb} alt=${meal.strMeal}  width="200"/>
+    <p><strong>Catgeory: </strong> ${meal.strCategory}</p>
+    <p><strong>Area: </strong>${meal.strArea}</p>
+
+   `;
+
+    results.appendChild(div);
+    div.addEventListener('click',()=>{
+                setTimeout(()=>{
+                    let p = document.createElement('p');
+                    p.textContent = 'Order is being prepared.'
+                    div.appendChild(p)
+                    setTimeout(()=>{
+                        p.textContent = 'Order is dispatched.'
+                        setTimeout(()=>{
+                            p.textContent = 'Food deliverd, enjoy your meal.'
+                            
+                        },3000)
+                    },2000)
+                },2000)
+                
+            })
+  });
+  pageInfo.textContent = `page ${currentPage} of ${totalPage}`;
+  prevBtn.disabled = currentPage === 1;
+  nextBtn.disabled = currentPage === totalPage;
+}
+
+function handleSorting() {
+ if(allMeals === 0){
+    results.innerHTML = "<p>No meals to show</p>";
+    pageInfo.textContent = "";
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+    return;
+}
+
+  const sortValue = sortBy.value;
+  const sortedMeals = [...allMeals];
+
+  sortedMeals.sort((a, b) => {
+    if (sortValue === "name-asc") {
+      return a.strMeal.localeCompare(b.strMeal);
+    } else {
+      return b.strMeal.localeCompare(a.strMeal);
+    }
+  });
+  renderMeals(sortedMeals);
+}
+
+
+prevBtn.addEventListener("click", () => {
+    if(currentPage > 1){
+        currentPage--;
+         handleSorting();
+    }
+})
+
+nextBtn.addEventListener("click", () => {
+    const totalPage = Math.ceil(allMeals.length/mealsPerPage);
+    if(currentPage < totalPage){
+        currentPage++;
+         handleSorting();
+    }
+})
+
+  </script>
 </html>
-
-<script src="index.js"></script>

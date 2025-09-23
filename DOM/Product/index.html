@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Itinerary Table</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Product Itinerary Table</h1>
+
+    <!-- Product Form -->
+    <form id="productForm">
+      <input type="text" id="productName" placeholder="Product Name" required>
+      <input type="number" id="quantity" placeholder="Quantity" required>
+      <input type="number" id="costPerUnit" placeholder="Cost per Unit" required>
+      <input type="number" id="soldQuantity" placeholder="Sold Quantity (default 0)" value="0">
+      <button type="submit">Add Product</button>
+    </form>
+
+    <!-- Product Table -->
+    <table id="productTable">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Quantity</th>
+          <th>Cost/Unit</th>
+          <th>Sold Qty</th>
+          <th>Total Cost</th>
+          <th>Total Sell</th>
+          <th>Total Benefit</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productBody">
+        <!-- Products will appear here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
